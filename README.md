@@ -59,6 +59,8 @@ docker-compose up -d
 
 This starts: PostgreSQL ×3, RabbitMQ, Keycloak, MinIO, pgvector.
 
+Note: docker-compose.yml is not yet in the repo — it lands in Sprint 1 Day 2 (CL-2). The instructions above will work once CL-2 is merged.
+
 ### Config Server
 
 The `config-repo/` directory is the git-backed configuration store for Spring Cloud Config Server. It is tracked as regular files in this repository.

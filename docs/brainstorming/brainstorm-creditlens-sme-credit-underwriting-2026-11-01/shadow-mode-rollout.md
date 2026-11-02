@@ -77,6 +77,9 @@ threshold_version_hash  string (which threshold was active)
 shadow_cohort_id        string (groups this record into a reporting cohort)
 ```
 
+The officer identity map — the table linking each pseudonymous officer_id to real officer identity — lives in PostgreSQL in a dedicated, access-controlled schema. Application and analytics roles have no read grant on it; access is limited to the risk_manager and dba roles. De-anonymisation (resolving an officer_id back to a named officer) can only be triggered by a user holding the risk_manager role, and every invocation is written to the audit log with the requesting user, target identifier, and timestamp. The application_id is treated as pseudonymous data under the same access controls as officer_id: it is excluded from logs, analytics exports, and third-party integrations, and reads require the same privileged role as the identity map. In practice, analysts and downstream services operate only on these pseudonymous identifiers, so re-identification is a deliberate, audited break-glass action rather than a routine query.
+
+
 Nothing in this log is shown to the officer. Nothing is written to the case management system. The shadow log is append-only. It cannot be edited or deleted.
 
 ### Infrastructure Checklist for Phase 1
