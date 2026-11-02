@@ -6,12 +6,12 @@
 # ============================================================
 # Force LF (must never be CRLF — breaks in Linux containers)
 # ============================================================
-*.sh            text eol=lf   # ADDED
+*.sh            text eol=lf
 *.bash          text eol=lf
 *.zsh           text eol=lf
-*.sql           text eol=lf   # ADDED
-*.yaml          text eol=lf   # ADDED
-*.yml           text eol=lf   # ADDED (you'll want this too — see note)
+*.sql           text eol=lf
+*.yaml          text eol=lf
+*.yml           text eol=lf
 *.json          text eol=lf
 *.toml          text eol=lf
 *.ini           text eol=lf
@@ -43,9 +43,9 @@ Makefile        text eol=lf
 *.css           text eol=lf
 *.scss          text eol=lf
 *.less          text eol=lf
-*.html          text eol=lf   # ADDED
+*.html          text eol=lf
 *.htm           text eol=lf
-*.xml           text eol=lf   # ADDED
+*.xml           text eol=lf
 *.xsd           text eol=lf
 *.xsl           text eol=lf
 *.svg           text eol=lf
