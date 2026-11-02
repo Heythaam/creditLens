@@ -59,7 +59,10 @@ docker-compose up -d
 
 This starts: PostgreSQL ×3, RabbitMQ, Keycloak, MinIO, pgvector.
 
-Note: docker-compose.yml is not yet in the repo — it lands in Sprint 1 Day 2 (CL-2). The instructions above will work once CL-2 is merged.
+### Local Infrastructure
+1. `cp .env.example .env`
+2. `docker compose up -d`
+3. Verify all containers are healthy: `docker compose ps`
 
 ### Config Server
 

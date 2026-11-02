@@ -1,0 +1,178 @@
+name: creditlens
+
+x-pg-healthcheck: &pg-healthcheck
+  test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+  interval: 10s
+  timeout: 5s
+  retries: 5
+  start_period: 15s
+
+services:
+  # ---------- PostgreSQL x3 ----------
+  postgres-app:
+    image: postgres:16-alpine
+    container_name: creditlens-postgres-app
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${APP_DB_USER}
+      POSTGRES_PASSWORD: ${APP_DB_PASSWORD}
+      POSTGRES_DB: ${APP_DB_NAME}
+    ports:
+      - "5432:5432" # CL-2 Note
+    volumes:
+      - pg_app_data:/var/lib/postgresql/data
+    healthcheck: *pg-healthcheck
+    networks: [backend]
+
+  postgres-airflow:
+    image: postgres:16-alpine
+    container_name: creditlens-postgres-airflow
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AIRFLOW_DB_USER}
+      POSTGRES_PASSWORD: ${AIRFLOW_DB_PASSWORD}
+      POSTGRES_DB: ${AIRFLOW_DB_NAME}
+    ports:
+      - "5433:5432" # CL-2 Note
+    volumes:
+      - pg_airflow_data:/var/lib/postgresql/data
+    healthcheck: *pg-healthcheck
+    networks: [backend]
+
+  postgres-keycloak:
+    image: postgres:16-alpine
+    container_name: creditlens-postgres-keycloak
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${KC_DB_USER}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+      POSTGRES_DB: ${KC_DB_NAME}
+    ports:
+      - "5434:5432" # CL-2 Note
+    volumes:
+      - pg_kc_data:/var/lib/postgresql/data
+    healthcheck: *pg-healthcheck
+    networks: [backend]
+
+  # ---------- pgvector ----------
+  pgvector:
+    image: pgvector/pgvector:pg16
+    container_name: creditlens-pgvector
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${VECTOR_DB_USER}
+      POSTGRES_PASSWORD: ${VECTOR_DB_PASSWORD}
+      POSTGRES_DB: ${VECTOR_DB_NAME}
+    ports:
+      - "5435:5432" # CL-2 Note
+    volumes:
+      - pg_vector_data:/var/lib/postgresql/data
+    healthcheck: *pg-healthcheck
+    networks: [backend]
+
+  # ---------- RabbitMQ ----------
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: creditlens-rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"   # CL-2 Note
+      - "15672:15672" # CL-2 Note
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks: [backend]
+
+  # ---------- Keycloak ----------
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: creditlens-keycloak
+    restart: unless-stopped
+    command:
+      - start-dev
+      - --http-enabled=true
+      - --hostname-strict=false
+      - --health-enabled=true
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres-keycloak:5432/${KC_DB_NAME}
+      KC_DB_USERNAME: ${KC_DB_USER}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KC_ADMIN_USER}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+    ports:
+      - "8080:8080" # CL-2 Note
+    depends_on:
+      postgres-keycloak:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          { printf 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3;
+            grep -q '200' <&3; } 3<>/dev/tcp/localhost/8080
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks: [backend]
+
+  # ---------- MinIO ----------
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: creditlens-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
+    ports:
+      - "9000:9000" # CL-2 Note
+      - "9001:9001" # CL-2 Note
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks: [backend]
+
+  # ---------- Redis (The 8th Container) ----------
+  redis:
+    image: redis:7-alpine
+    container_name: creditlens-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks: [backend]
+
+volumes:
+  pg_app_data:
+  pg_airflow_data:
+  pg_kc_data:
+  pg_vector_data:
+  rabbitmq_data:
+  minio_data:
+  redis_data:
+
+networks:
+  backend:
+    driver: bridge
