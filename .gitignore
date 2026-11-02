@@ -1,0 +1,156 @@
+config-repo/.git
+
+# ============================================================
+# Environment / secrets  (commit .env.example, never .env)
+# ============================================================
+.env
+.env.*
+!.env.example
+*.env.local
+.envrc
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+
+# ============================================================
+# Java / Maven / Gradle
+# ============================================================
+target/
+build/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+.gradle/
+gradle-app.setting
+!gradle-wrapper.properties
+*.hprof
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+.python-version
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+*.cover
+*.py,cover
+
+# ============================================================
+# Angular / Node
+# ============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.npm
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+dist/
+.angular/
+.cache/
+coverage/
+*.tsbuildinfo
+.eslintcache
+.parcel-cache/
+
+# ============================================================
+# Airflow
+# ============================================================
+logs/
+airflow/logs/
+airflow-webserver.pid
+airflow.cfg
+airflow.db
+webserver_config.py
+standalone_admin_password.txt
+*.pid
+
+# ============================================================
+# IDE / editors
+# ============================================================
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Docker / infra artifacts
+# ============================================================
+*.log
+docker-compose.override.yml
+.docker/
+pgdata/
+minio-data/
+
+# ============================================================
+# ML / data
+# ============================================================
+*.ipynb_checkpoints/
+.ipynb_checkpoints/
+data/
+!data/.gitkeep
+models/
+!models/.gitkeep
+mlruns/
+mlartifacts/
+wandb/
+*.onnx
+*.pt
+*.pth
+*.ckpt
+*.safetensors

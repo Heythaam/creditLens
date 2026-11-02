@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CreditLens — SME Credit Underwriting · Brainstorming Session · 2026-11-01</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #161a22;
+    --surface3: #1c2130;
+    --border: #232a38;
+    --border2: #2d3748;
+    --gold: #c9a84c;
+    --gold2: #e8c874;
+    --gold-dim: rgba(201,168,76,0.15);
+    --teal: #2dd4bf;
+    --teal-dim: rgba(45,212,191,0.12);
+    --red: #f87171;
+    --blue: #60a5fa;
+    --blue-dim: rgba(96,165,250,0.12);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167,139,250,0.12);
+    --text: #e2e8f0;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --must: #ef4444;
+    --should: #f59e0b;
+    --could: #22c55e;
+    --wont: #64748b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    overflow-x: hidden;
+  }
+
+  /* ── NOISE TEXTURE OVERLAY ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  /* ── LAYOUT ── */
+  .page { position: relative; z-index: 1; max-width: 1140px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  /* ── HEADER ── */
+  .header {
+    padding: 4rem 0 3rem;
+    border-bottom: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 2rem;
+  }
+  .header-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .header-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--gold);
+  }
+  .header h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .header h1 span { color: var(--gold); }
+  .header-subtitle {
+    margin-top: 0.75rem;
+    color: var(--text2);
+    font-size: 1rem;
+    max-width: 560px;
+  }
+  .header-meta {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 2;
+  }
+  .header-meta strong { color: var(--text2); }
+  .badge-row { display: flex; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap; }
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border2);
+    border-radius: 3px;
+    color: var(--text3);
+    background: var(--surface);
+  }
+
+  /* ── SECTION CHROME ── */
+  .section { margin-top: 5rem; }
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.5rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.35rem;
+  }
+  .section-rule {
+    height: 2px;
+    background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    margin: 1.25rem 0 2rem;
+  }
+
+  /* ── JTBD ── */
+  .jtbd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+  .jtbd-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .jtbd-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .jtbd-card.loan::before { background: var(--gold); }
+  .jtbd-card.sme::before { background: var(--teal); }
+  .jtbd-card.risk::before { background: var(--purple); }
+  .jtbd-card:hover { border-color: var(--border2); }
+  .jtbd-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .jtbd-card.loan .jtbd-role { color: var(--gold); }
+  .jtbd-card.sme .jtbd-role { color: var(--teal); }
+  .jtbd-card.risk .jtbd-role { color: var(--purple); }
+  .jtbd-statement {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    line-height: 1.4;
+    margin-bottom: 0.85rem;
+  }
+  .jtbd-details { list-style: none; }
+  .jtbd-details li {
+    font-size: 0.875rem;
+    color: var(--text2);
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--border);
+    padding-left: 1rem;
+    position: relative;
+  }
+  .jtbd-details li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--text3);
+    font-size: 0.75rem;
+  }
+  .jtbd-details li:last-child { border-bottom: none; }
+
+  /* ── STARBURST ── */
+  .starburst-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+  .starburst-svg-container {
+    flex-shrink: 0;
+  }
+  .starburst-panels { flex: 1; min-width: 280px; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .starburst-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem;
+  }
+  .starburst-panel-q {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 0.7rem;
+  }
+  .q-who .starburst-panel-q { color: #f87171; }
+  .q-what .starburst-panel-q { color: #fb923c; }
+  .q-why .starburst-panel-q { color: var(--gold); }
+  .q-how .starburst-panel-q { color: var(--teal); }
+  .q-when .starburst-panel-q { color: var(--blue); }
+  .q-where .starburst-panel-q { color: var(--purple); }
+  .starburst-panel ul { list-style: none; }
+  .starburst-panel li {
+    font-size: 0.8rem;
+    color: var(--text2);
+    padding: 0.25rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+  }
+  .starburst-panel li:last-child { border-bottom: none; }
+
+  /* ── DISNEY ── */
+  .disney-rooms {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+  @media (max-width: 700px) { .disney-rooms { grid-template-columns: 1fr; } }
+  .room {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .room-header {
+    padding: 1.25rem 1.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .room-icon {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .room-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .room-body { padding: 0 1.5rem 1.5rem; flex: 1; }
+  .room-item {
+    font-size: 0.85rem;
+    color: var(--text2);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.45;
+  }
+  .room-item:last-child { border-bottom: none; }
+  .room-item strong { color: var(--text); }
+
+  /* Dreamer */
+  .room.dreamer { background: linear-gradient(160deg, #0f1a2e 0%, var(--surface) 100%); }
+  .room.dreamer .room-header { background: rgba(96,165,250,0.08); border-bottom: 1px solid rgba(96,165,250,0.15); }
+  .room.dreamer .room-icon { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .room.dreamer .room-name { color: var(--blue); }
+
+  /* Realist */
+  .room.realist { background: linear-gradient(160deg, #0d1a14 0%, var(--surface) 100%); }
+  .room.realist .room-header { background: rgba(34,197,94,0.08); border-bottom: 1px solid rgba(34,197,94,0.15); }
+  .room.realist .room-icon { background: rgba(34,197,94,0.15); color: #4ade80; }
+  .room.realist .room-name { color: #4ade80; }
+
+  /* Critic */
+  .room.critic { background: linear-gradient(160deg, #1a0f0f 0%, var(--surface) 100%); }
+  .room.critic .room-header { background: rgba(248,113,113,0.08); border-bottom: 1px solid rgba(248,113,113,0.15); }
+  .room.critic .room-icon { background: rgba(248,113,113,0.15); color: var(--red); }
+  .room.critic .room-name { color: var(--red); }
+
+  /* ── BACKCASTING ── */
+  .backcasting-timeline {
+    position: relative;
+    padding: 2.5rem 0 1rem;
+  }
+  .bc-vision-quote {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    position: relative;
+  }
+  .bc-vision-quote blockquote {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    font-style: italic;
+    color: var(--gold2);
+    line-height: 1.5;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 3rem;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    background: rgba(201,168,76,0.04);
+    position: relative;
+  }
+  .bc-vision-quote blockquote::before {
+    content: '"';
+    font-size: 5rem;
+    color: var(--gold-dim);
+    position: absolute;
+    top: -0.5rem;
+    left: 1rem;
+    line-height: 1;
+    font-family: 'Playfair Display', serif;
+  }
+  .bc-vision-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 0.75rem;
+  }
+
+  .bc-chain {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+  }
+  .bc-node {
+    flex: 1;
+    min-width: 200px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.25rem 1.25rem 1.25rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .bc-node + .bc-node { margin-left: 2.5rem; }
+  .bc-node + .bc-node::before {
+    content: '←';
+    position: absolute;
+    left: -1.85rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gold);
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .bc-step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 0.5rem;
+  }
+  .bc-node-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.6rem;
+    line-height: 1.35;
+  }
+  .bc-node-body {
+    font-size: 0.8rem;
+    color: var(--text2);
+    line-height: 1.5;
+    flex: 1;
+  }
+  .bc-node.start { border-color: var(--gold); background: rgba(201,168,76,0.05); }
+  .bc-node.start .bc-step-num { color: var(--gold); }
+  .bc-node.end { border-color: var(--teal); background: rgba(45,212,191,0.04); }
+  .bc-node.end .bc-step-num { color: var(--teal); }
+
+  .trust-quote-wrap {
+    margin-top: 2.5rem;
+    display: flex;
+    justify-content: center;
+  }
+  .trust-quote {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.95rem;
+    color: var(--teal);
+    border-left: 3px solid var(--teal);
+    padding: 1rem 1.5rem;
+    background: var(--teal-dim);
+    border-radius: 0 4px 4px 0;
+    max-width: 640px;
+    line-height: 1.6;
+  }
+  .trust-quote .attr { font-size: 0.75rem; color: var(--text3); margin-top: 0.5rem; letter-spacing: 0.08em; }
+
+  /* ── SYNTHESIS ── */
+  .synthesis-section {
+    background: linear-gradient(135deg, #0f1520 0%, #0a0c10 100%);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 3rem;
+    margin-top: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .synthesis-section::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201,168,76,0.07) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .synthesis-section::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(45,212,191,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .synthesis-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: #fff;
+    margin-bottom: 2rem;
+    line-height: 1.3;
+  }
+  .synthesis-headline span { color: var(--gold); }
+  .insight-list { list-style: none; display: grid; gap: 1.25rem; position: relative; z-index: 1; }
+  .insight-item {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 1.25rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: border-color 0.2s;
+  }
+  .insight-item:hover { border-color: var(--gold-dim); }
+  .insight-num {
+    width: 2.5rem; height: 2.5rem;
+    border-radius: 50%;
+    background: var(--gold-dim);
+    border: 1px solid var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .insight-text {
+    font-size: 0.925rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .insight-text strong { color: var(--text); }
+
+  /* ── THROUGH-LINE ── */
+  .through-line {
+    margin: 2.5rem 0 0;
+    padding: 2rem;
+    background: rgba(201,168,76,0.06);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 6px;
+    position: relative;
+    z-index: 1;
+  }
+  .through-line-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+  .through-line p {
+    font-size: 1rem;
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .through-line p em { color: var(--gold2); font-style: normal; font-weight: 500; }
+
+  /* ── MOSCOW ── */
+  .moscow-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+  @media (max-width: 750px) { .moscow-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 420px) { .moscow-grid { grid-template-columns: 1fr; } }
+  .moscow-col {
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .moscow-header {
+    padding: 0.9rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .moscow-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .moscow-must .moscow-header { background: rgba(239,68,68,0.12); color: var(--must); border-bottom: 1px solid rgba(239,68,68,0.2); }
+  .moscow-must .moscow-dot { background: var(--must); }
+  .moscow-should .moscow-header { background: rgba(245,158,11,0.12); color: var(--should); border-bottom: 1px solid rgba(245,158,11,0.2); }
+  .moscow-should .moscow-dot { background: var(--should); }
+  .moscow-could .moscow-header { background: rgba(34,197,94,0.12); color: var(--could); border-bottom: 1px solid rgba(34,197,94,0.2); }
+  .moscow-could .moscow-dot { background: var(--could); }
+  .moscow-wont .moscow-header { background: rgba(100,116,139,0.12); color: var(--wont); border-bottom: 1px solid rgba(100,116,139,0.2); }
+  .moscow-wont .moscow-dot { background: var(--wont); }
+  .moscow-body { background: var(--surface); padding: 0.85rem 1.1rem; }
+  .moscow-cluster {
+    font-size: 0.825rem;
+    color: var(--text2);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    line-height: 1.4;
+  }
+  .moscow-cluster:last-child { border-bottom: none; }
+  .moscow-cluster strong { color: var(--text); display: block; font-size: 0.75rem; margin-bottom: 0.1rem; }
+  .moscow-rationale {
+    font-size: 0.75rem;
+    color: var(--text3);
+    margin-top: 0.75rem;
+    font-style: italic;
+    line-height: 1.45;
+    padding-top: 0.5rem;
+    border-top: 1px dashed var(--border);
+  }
+
+  /* ── CLUSTERS ── */
+  .clusters-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+  .cluster-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1.1rem;
+  }
+  .cluster-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--text3);
+    margin-bottom: 0.4rem;
+  }
+  .cluster-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+  }
+  .cluster-desc { font-size: 0.8rem; color: var(--text2); line-height: 1.45; }
+
+  /* ── FOOTER ── */
+  .footer {
+    margin-top: 5rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap;
+    gap: 1rem;
+  }
+  .footer-left {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text3);
+    line-height: 1.8;
+  }
+  .footer-left strong { color: var(--text2); }
+  .footer-right {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--border2);
+  }
+
+  /* ── SVG STARBURST ── */
+  #starburst-svg text { font-family: 'JetBrains Mono', monospace; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══════════════════ HEADER ══════════════════ -->
+  <header class="header">
+    <div>
+      <div class="header-eyebrow">Brainstorming Session · Tunisia · Fintech</div>
+      <h1>Credit<span>Lens</span></h1>
+      <p class="header-subtitle">Intelligent SME Credit Underwriting Platform — Architecture, Trust Protocol &amp; Platform Vision</p>
+      <div class="badge-row">
+        <span class="badge">Job to Be Done</span>
+        <span class="badge">Starbursting</span>
+        <span class="badge">Disney Method</span>
+        <span class="badge">Backcasting</span>
+        <span class="badge">MoSCoW</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div><strong>Date</strong> 2026-11-01</div>
+      <div><strong>Status</strong> Complete</div>
+      <div><strong>Clusters</strong> 8</div>
+      <div><strong>Mode</strong> Facilitator</div>
+    </div>
+  </header>
+
+
+  <!-- ══════════════════ JTBD ══════════════════ -->
+  <section class="section" id="jtbd">
+    <div class="section-label">Technique 01</div>
+    <div class="section-title">Job to Be Done</div>
+    <div class="section-rule"></div>
+
+    <div class="jtbd-grid">
+      <div class="jtbd-card loan">
+        <div class="jtbd-role">Loan Officer</div>
+        <div class="jtbd-statement">Transfer the burden of proof from the person to the system</div>
+        <ul class="jtbd-details">
+          <li>Defensible decision backed by full audit trail</li>
+          <li>Model score + SHAP + circular citation + threshold</li>
+          <li>Override logged with mandatory reason code — never ignored, never silently discarded</li>
+          <li>Override rate per officer = bias detection metric</li>
+        </ul>
+      </div>
+
+      <div class="jtbd-card sme">
+        <div class="jtbd-role">SME Owner</div>
+        <div class="jtbd-statement">Translate real business activity into a language the bank finally understands</div>
+        <ul class="jtbd-details">
+          <li>Feel heard, assessed fairly, given dignity</li>
+          <li>Portal shows the business back to the owner</li>
+          <li>Explains what's hurting the score and what to fix</li>
+          <li>Not another form — a mirror of the business</li>
+        </ul>
+      </div>
+
+      <div class="jtbd-card risk">
+        <div class="jtbd-role">Risk Manager</div>
+        <div class="jtbd-statement">Compress the feedback loop between market reality and lending policy</div>
+        <ul class="jtbd-details">
+          <li>Know before defaults happen, not after</li>
+          <li>PSI drift on cash-flow feature = economic shift signal, not just DevOps alert</li>
+          <li>Nightmare: cluster of loans approved 8 months ago, same sector, missing payments — signal was there all along, just not watched</li>
+          <li>Threshold owned 4-eyes: ML engineer proposes, risk manager approves</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ STARBURSTING ══════════════════ -->
+  <section class="section" id="starburst">
+    <div class="section-label">Technique 02</div>
+    <div class="section-title">Starbursting</div>
+    <div class="section-rule"></div>
+
+    <div class="starburst-wrap">
+      <!-- SVG starburst diagram -->
+      <div class="starburst-svg-container">
+        <svg id="starburst-svg" width="340" height="340" viewBox="-170 -170 340 340" xmlns="http://www.w3.org/2000/svg" aria-label="Starburst diagram with six question axes">
+          <!-- Axes -->
+          <g stroke-width="1.5" opacity="0.35">
+            <line x1="0" y1="0" x2="0" y2="-130" stroke="#f87171"/>
+            <line x1="0" y1="0" x2="113" y2="-65" stroke="#fb923c"/>
+            <line x1="0" y1="0" x2="113" y2="65" stroke="#c9a84c"/>
+            <line x1="0" y1="0" x2="0" y2="130" stroke="#2dd4bf"/>
+            <line x1="0" y1="0" x2="-113" y2="65" stroke="#60a5fa"/>
+            <line x1="0" y1="0" x2="-113" y2="-65" stroke="#a78bfa"/>
+          </g>
+          <!-- Concentric rings -->
+          <circle cx="0" cy="0" r="45" fill="none" stroke="#232a38" stroke-width="1"/>
+          <circle cx="0" cy="0" r="90" fill="none" stroke="#232a38" stroke-width="1" stroke-dasharray="4 4"/>
+          <circle cx="0" cy="0" r="130" fill="none" stroke="#232a38" stroke-width="0.5" stroke-dasharray="2 6"/>
+          <!-- Center -->
+          <circle cx="0" cy="0" r="38" fill="#161a22" stroke="#2d3748" stroke-width="1.5"/>
+          <text x="0" y="-7" text-anchor="middle" font-size="8.5" fill="#94a3b8" letter-spacing="1.5">CREDIT</text>
+          <text x="0" y="5" text-anchor="middle" font-size="8.5" fill="#94a3b8" letter-spacing="1.5">LENS</text>
+          <text x="0" y="17" text-anchor="middle" font-size="7" fill="#c9a84c">SME</text>
+          <!-- WHO top -->
+          <circle cx="0" cy="-130" r="20" fill="#1a0f0f" stroke="#f87171" stroke-width="1.5"/>
+          <text x="0" y="-126" text-anchor="middle" font-size="9" font-weight="600" fill="#f87171">WHO</text>
+          <!-- WHAT top-right -->
+          <circle cx="113" cy="-65" r="20" fill="#1a100a" stroke="#fb923c" stroke-width="1.5"/>
+          <text x="113" y="-61" text-anchor="middle" font-size="9" font-weight="600" fill="#fb923c">WHAT</text>
+          <!-- WHY bottom-right -->
+          <circle cx="113" cy="65" r="20" fill="#1a140a" stroke="#c9a84c" stroke-width="1.5"/>
+          <text x="113" y="69" text-anchor="middle" font-size="9" font-weight="600" fill="#c9a84c">WHY</text>
+          <!-- HOW bottom -->
+          <circle cx="0" cy="130" r="20" fill="#0a1a18" stroke="#2dd4bf" stroke-width="1.5"/>
+          <text x="0" y="134" text-anchor="middle" font-size="9" font-weight="600" fill="#2dd4bf">HOW</text>
+          <!-- WHEN bottom-left -->
+          <circle cx="-113" cy="65" r="20" fill="#0a1020" stroke="#60a5fa" stroke-width="1.5"/>
+          <text x="-113" y="69" text-anchor="middle" font-size="9" font-weight="600" fill="#60a5fa">WHEN</text>
+          <!-- WHERE top-left -->
+          <circle cx="-113" cy="-65" r="20" fill="#110a1a" stroke="#a78bfa" stroke-width="1.5"/>
+          <text x="-113" y="-61" text-anchor="middle" font-size="9" font-weight="600" fill="#a78bfa">WHERE</text>
+          <!-- Dot markers along axes -->
+          <circle cx="0" cy="-72" r="3" fill="#f87171" opacity="0.6"/>
+          <circle cx="72" cy="-41" r="3" fill="#fb923c" opacity="0.6"/>
+          <circle cx="72" cy="41" r="3" fill="#c9a84c" opacity="0.6"/>
+          <circle cx="0" cy="72" r="3" fill="#2dd4bf" opacity="0.6"/>
+          <circle cx="-72" cy="41" r="3" fill="#60a5fa" opacity="0.6"/>
+          <circle cx="-72" cy="-41" r="3" fill="#a78bfa" opacity="0.6"/>
+        </svg>
+      </div>
+
+      <div class="starburst-panels">
+        <div class="starburst-panel q-who">
+          <div class="starburst-panel-q">WHO</div>
+          <ul>
+            <li>Model = advisory, never authoritative (regulatory requirement)</li>
+            <li>Loan officer on small loans; risk manager on large</li>
+            <li>Threshold owned 4-eyes: ML proposes, RM approves</li>
+            <li>Wrong access corrupts the audit trail — no executive overrides</li>
+          </ul>
+        </div>
+        <div class="starburst-panel q-what">
+          <div class="starburst-panel-q">WHAT</div>
+          <ul>
+            <li>Behavioral financial fingerprint — GDPR/BCT data rights obligation</li>
+            <li>SHAP = legally required disclosure, not a UX feature</li>
+            <li>Cold start = "unscoreable" (no-score, not low-score)</li>
+            <li>Overrides logged, never ingested as model ground truth</li>
+          </ul>
+        </div>
+        <div class="starburst-panel q-why">
+          <div class="starburst-panel-q">WHY</div>
+          <ul>
+            <li>Shadow mode = trust-building protocol, not a testing phase</li>
+            <li>Self-hosted only: SaaS kills procurement at legal review</li>
+            <li>Uncited RAG answer = liability; citation = chain of custody</li>
+          </ul>
+        </div>
+        <div class="starburst-panel q-how">
+          <div class="starburst-panel-q">HOW</div>
+          <ul>
+            <li>Role-keyed SHAP: plain text / full waterfall / population aggregates</li>
+            <li>Conflict detection in reindexing DAG — pending review before overwrite</li>
+            <li>Immutable decision snapshot: model hash + feature values + threshold + RAG citations</li>
+          </ul>
+        </div>
+        <div class="starburst-panel q-when">
+          <div class="starburst-panel-q">WHEN</div>
+          <ul>
+            <li>Post-disbursement monitoring ignored: officer incentive ends at approval</li>
+            <li>Drift alerts routed to risk manager, not officer</li>
+            <li>Compensation structure problem, not UX problem</li>
+          </ul>
+        </div>
+        <div class="starburst-panel q-where">
+          <div class="starburst-panel-q">WHERE</div>
+          <ul>
+            <li>Never positioned as replacement — "decision support layer"</li>
+            <li>Actually replaces Excel scorecard and PDF search</li>
+            <li>Don't say that during procurement — incumbent protection stalls projects</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ DISNEY METHOD ══════════════════ -->
+  <section class="section" id="disney">
+    <div class="section-label">Technique 03</div>
+    <div class="section-title">Disney Method</div>
+    <div class="section-rule"></div>
+
+    <div class="disney-rooms">
+      <div class="room dreamer">
+        <div class="room-header">
+          <div class="room-icon">✦</div>
+          <div>
+            <div class="room-name">The Dreamer</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="room-item">
+            <strong>Living credit profile</strong> — visible on the SME's phone in real time; bank comes to them, not the other way around
+          </div>
+          <div class="room-item">
+            <strong>Compliance layer</strong> rewrites its own guidance when regulatory updates arrive — without human intervention
+          </div>
+          <div class="room-item">
+            <strong>Risk manager dashboard</strong> predicts portfolio stress from macro signals before repayment data reflects it
+          </div>
+          <div class="room-item">
+            <strong>Financial passport</strong> — SME owns their score; banks compete for the relationship; two-sided credit market; the infrastructure SWIFT never reached
+          </div>
+        </div>
+      </div>
+
+      <div class="room realist">
+        <div class="room-header">
+          <div class="room-icon">⊕</div>
+          <div>
+            <div class="room-name">The Realist</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="room-item">
+            <strong>v1 SME portal</strong> = read-only view: extracted features, score, plain-language SHAP, BCT articles checked — downloadable PDF financial profile
+          </div>
+          <div class="room-item">
+            <strong>Plants the flag</strong> that the SME has a right to see what the system knows about them
+          </div>
+          <div class="room-item">
+            <strong>Proactive outreach</strong> when declined SME's profile improves — reuse drift monitoring DAG, fire RabbitMQ event to notify loan officer; no new infrastructure
+          </div>
+        </div>
+      </div>
+
+      <div class="room critic">
+        <div class="room-header">
+          <div class="room-icon">⚠</div>
+          <div>
+            <div class="room-name">The Critic</div>
+          </div>
+        </div>
+        <div class="room-body">
+          <div class="room-item">
+            <strong>Minimum viable override failure</strong> — officers find fastest reason code, use every time; audit trail looks complete but is compliance theater; system detects performance of reasoning, not actual reasoning
+          </div>
+          <div class="room-item">
+            <strong>Semantic promiscuity in RAG</strong> — one high-similarity chunk cited in 40% of queries; similarity ≠ relevance; fix = citation frequency dashboard; chunks above statistical threshold trigger human review
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ BACKCASTING ══════════════════ -->
+  <section class="section" id="backcasting">
+    <div class="section-label">Technique 04</div>
+    <div class="section-title">Backcasting</div>
+    <div class="section-rule"></div>
+
+    <div class="backcasting-timeline">
+      <div class="bc-vision-quote">
+        <blockquote>
+          A Tuesday where the system was invisible because everything it was supposed to prevent simply didn't happen — 23-minute approval, no spreadsheet opened, no PDF searched, SME gets plain-language explanation of what improved since their last declined application.
+        </blockquote>
+        <div class="bc-vision-label">The Vision · The Tuesday Test</div>
+      </div>
+
+      <div class="bc-chain">
+        <div class="bc-node start">
+          <div class="bc-step-num">Step 3 · First Move</div>
+          <div class="bc-node-title">One Signature on a Data Access Agreement</div>
+          <div class="bc-node-body">Senior bank sign-off defining which transaction fields CreditLens can read, in what format, under whose authorization. The first move is not technical — it is getting this one signature. Every subsequent step traces back to this data handshake.</div>
+        </div>
+
+        <div class="bc-node">
+          <div class="bc-step-num">Step 2 · Foundation</div>
+          <div class="bc-node-title">Clean, Stable Features from Real Transaction Data</div>
+          <div class="bc-node-body">Shadow mode results must be worth showing before trust can form. A model wrong in random ways (bad features) is worse than consistently wrong. Features must match the reality the officer sees when working manually.</div>
+        </div>
+
+        <div class="bc-node">
+          <div class="bc-step-num">Step 1 · Prerequisite</div>
+          <div class="bc-node-title">One Officer's Private Trust</div>
+          <div class="bc-node-body">Shadow mode shows honest results over time. Not deployed by announcement — formed through demonstrated accuracy on blind spots the officer already suspected. Trust is earned on specific cases, not on aggregate statistics.</div>
+        </div>
+
+        <div class="bc-node end">
+          <div class="bc-step-num">Vision · The Tuesday</div>
+          <div class="bc-node-title">The System is Invisible</div>
+          <div class="bc-node-body">23-minute approval. No spreadsheet opened. No PDF searched. SME receives a plain-language explanation of what improved since their last declined application. Every prevention is invisible because every failure was prevented.</div>
+        </div>
+      </div>
+
+      <div class="trust-quote-wrap">
+        <div class="trust-quote">
+          "You can't deploy trust. You can only create the conditions for it to form."
+          <div class="attr">— Session Insight · Backcasting Step 1</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ AFFINITY CLUSTERS ══════════════════ -->
+  <section class="section" id="clusters">
+    <div class="section-label">Convergence · 8 Clusters</div>
+    <div class="section-title">Affinity Clustering</div>
+    <div class="section-rule"></div>
+
+    <div class="clusters-grid">
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster A</div>
+        <div class="cluster-name">Trust Architecture</div>
+        <div class="cluster-desc">Shadow mode as trust protocol; conditions for trust formation; adoption strategy depends on this being built intentionally from day one.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster B</div>
+        <div class="cluster-name">Accountability &amp; Auditability</div>
+        <div class="cluster-desc">Immutable decision snapshot; SHAP as legal disclosure; override analytics; 4-eyes threshold control; append-only audit log.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster C</div>
+        <div class="cluster-name">Graceful Degradation</div>
+        <div class="cluster-desc">"Unscoreable" state for thin data; manual underwriting checklist; RAG low-confidence fallback; intellectual honesty as design pattern.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster D</div>
+        <div class="cluster-name">Role-keyed Experience</div>
+        <div class="cluster-desc">Keycloak RBAC controls complexity level, not just access. Officer: plain language. Analyst: full waterfall. Risk manager: population aggregates.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster E</div>
+        <div class="cluster-name">Incentive Misalignment</div>
+        <div class="cluster-desc">Officer incentive ends at approval, not repayment. Drift alerts routed directly to risk manager. Compensation structure problem, outside software scope.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster F</div>
+        <div class="cluster-name">SME Dignity &amp; Rights</div>
+        <div class="cluster-desc">Data rights under GDPR/BCT. Read-only portal. Proactive re-engagement on profile improvement. SME has a right to see what the system knows about them.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster G</div>
+        <div class="cluster-name">Platform as Infrastructure</div>
+        <div class="cluster-desc">Financial passport — portable SME identity. Two-sided market for SME credit. The infrastructure SWIFT never reached. v1 and v3 are the same principle at different power stages.</div>
+      </div>
+      <div class="cluster-card">
+        <div class="cluster-id">Cluster H</div>
+        <div class="cluster-name">Build Sequence</div>
+        <div class="cluster-desc">First move is political, not technical: one signature on a data access agreement. Everything else follows from that handshake. Shadow mode cannot be cut under time pressure.</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ MoSCoW ══════════════════ -->
+  <section class="section" id="moscow">
+    <div class="section-label">Scope</div>
+    <div class="section-title">MoSCoW Prioritization</div>
+    <div class="section-rule"></div>
+
+    <div class="moscow-grid">
+      <div class="moscow-col moscow-must">
+        <div class="moscow-header"><span class="moscow-dot"></span>Must Have</div>
+        <div class="moscow-body">
+          <div class="moscow-cluster">
+            <strong>B · Accountability &amp; Auditability</strong>
+            Immutable snapshots, override logging, SHAP disclosure, 4-eyes threshold control
+          </div>
+          <div class="moscow-cluster">
+            <strong>D · Role-keyed Experience</strong>
+            RBAC-controlled SHAP rendering per role; Keycloak integration
+          </div>
+          <div class="moscow-rationale">Without these two clusters the core value proposition — defensible, explainable, auditable decisions — does not exist. The skeleton of the system.</div>
+        </div>
+      </div>
+
+      <div class="moscow-col moscow-should">
+        <div class="moscow-header"><span class="moscow-dot"></span>Should Have</div>
+        <div class="moscow-body">
+          <div class="moscow-cluster">
+            <strong>A · Trust Architecture</strong>
+            Shadow mode designed as a first-class trust-building protocol from day one
+          </div>
+          <div class="moscow-cluster">
+            <strong>H · Build Sequence</strong>
+            Data access agreement first; political blockers identified and sequenced
+          </div>
+          <div class="moscow-rationale">Determines whether adoption sticks or collapses. Shadow mode cut under time pressure = adoption strategy gone.</div>
+        </div>
+      </div>
+
+      <div class="moscow-col moscow-could">
+        <div class="moscow-header"><span class="moscow-dot"></span>Could Have</div>
+        <div class="moscow-body">
+          <div class="moscow-cluster">
+            <strong>F · SME Dignity &amp; Rights</strong>
+            Read-only portal; proactive re-engagement; PDF financial profile
+          </div>
+          <div class="moscow-cluster">
+            <strong>G · Platform as Infrastructure</strong>
+            Financial passport; portable SME identity; two-sided market vision
+          </div>
+          <div class="moscow-rationale">Real value, but requires a stable core. v2 and v3 targets. The answer to "why does this project matter beyond a portfolio piece."</div>
+        </div>
+      </div>
+
+      <div class="moscow-col moscow-wont">
+        <div class="moscow-header"><span class="moscow-dot"></span>Won't Have (v1)</div>
+        <div class="moscow-body">
+          <div class="moscow-cluster">
+            <strong>C · Graceful Degradation</strong>
+            Requires production data volume to tune unscoreable thresholds
+          </div>
+          <div class="moscow-cluster">
+            <strong>E · Incentive Misalignment</strong>
+            Compensation structure problem; organizational change outside software scope
+          </div>
+          <div class="moscow-rationale">Not problems software can solve in v1. Require production deployment data and organizational authority. Acknowledged, not ignored.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ SYNTHESIS ══════════════════ -->
+  <section class="section" id="synthesis">
+    <div class="section-label">Climax · Session Synthesis</div>
+    <div class="section-title">What This Session Found</div>
+    <div class="section-rule"></div>
+
+    <div class="synthesis-section">
+      <div class="synthesis-headline">
+        Five insights that <span>reframe the project</span>
+      </div>
+
+      <ul class="insight-list">
+        <li class="insight-item">
+          <div class="insight-num">01</div>
+          <div class="insight-text">
+            <strong>The whole project is about one gap.</strong> The distance between a decision being made and that decision being explainable. SHAP, citation chain, immutable snapshot, and role-keyed rendering are not four features — they are four faces of the same problem. Build one thing that closes that gap, and everything else follows.
+          </div>
+        </li>
+        <li class="insight-item">
+          <div class="insight-num">02</div>
+          <div class="insight-text">
+            <strong>Shadow mode is not a testing phase.</strong> It is the trust-building protocol. If cut under time pressure, the entire adoption strategy collapses — not just the rollout schedule. It must be designed as a first-class feature from day one, not retrofitted later. The system earns its seat at the table by being right on the loan officer's blind spots.
+          </div>
+        </li>
+        <li class="insight-item">
+          <div class="insight-num">03</div>
+          <div class="insight-text">
+            <strong>The financial passport is the answer to "why does this project exist beyond a portfolio piece."</strong> It started as a Dreamer room idea. It points toward something that matters at scale for Tunisia and the entire region — portable SME financial identity for the 60% of businesses SWIFT never reached.
+          </div>
+        </li>
+        <li class="insight-item">
+          <div class="insight-num">04</div>
+          <div class="insight-text">
+            <strong>Compliance theater and shadow mode failure are the same problem from opposite ends.</strong> Both are solved only if the system shows people things they couldn't have seen without it. The technical feature is identical. Human follow-through is what makes it real or empty. A system that detects the performance of reasoning rather than the reasoning itself has failed its purpose.
+          </div>
+        </li>
+        <li class="insight-item">
+          <div class="insight-num">05</div>
+          <div class="insight-text">
+            <strong>"Unscoreable" is not an edge case — it is the system's epistemology.</strong> The willingness to say "insufficient data" is what earns the authority of every score the system does return. Intellectual honesty is a design pattern, not an ethical stance. It applies equally to the RAG pipeline's low-confidence retrievals. A system that always answers is less trustworthy than one that sometimes declines to.
+          </div>
+        </li>
+      </ul>
+
+      <div class="through-line">
+        <div class="through-line-label">Core Through-Line</div>
+        <p>
+          The data access agreement (Backcasting) and the financial passport (Dreamer) are <em>the same legal question from opposite sides</em>. The bank says "we can use this SME's data." The passport is the SME saying "this data is mine." v1 and v3 are not different products — they are the same principle at different stages of <em>power redistribution</em>. The project's long arc bends from bank infrastructure toward SME sovereignty.
+        </p>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ══════════════════ FOOTER ══════════════════ -->
+  <footer class="footer">
+    <div class="footer-left">
+      <div><strong>CreditLens</strong> — SME Credit Underwriting Platform</div>
+      <div>Brainstorming session · 2026-11-01 · Tunisia</div>
+      <div>Techniques: JTBD · Starbursting · Disney Method · Backcasting</div>
+    </div>
+    <div class="footer-right">CREDITLENS · CONFIDENTIAL</div>
+  </footer>
+
+</div>
+</body>
+</html>
